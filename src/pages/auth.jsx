@@ -1,7 +1,46 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { api, saveSession } from '../lib/api'
 
 const Auth = () => {
   const [isCreateAccount, setIsCreateAccount] = useState(false)
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', accepted: false })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const handleChange = (event) => {
+    const { name, value, checked, type } = event.target
+    setForm((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }))
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setError('')
+
+    if (isCreateAccount && form.password !== form.confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
+    if (isCreateAccount && !form.accepted) {
+      setError('Please accept account updates to continue.')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const session = isCreateAccount
+        ? await api.register({ name: form.name, email: form.email, password: form.password })
+        : await api.login({ email: form.email, password: form.password })
+      saveSession(session)
+      navigate('/dashboard')
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <section className="mx-auto grid w-full max-w-6xl items-center gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:py-16">
@@ -37,13 +76,17 @@ const Auth = () => {
           </p>
         </div>
 
-        <form className="mt-8 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           {isCreateAccount && (
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">Full name</span>
               <input
+                name="name"
                 type="text"
+                value={form.name}
+                onChange={handleChange}
                 placeholder="Your name"
+                required={isCreateAccount}
                 className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-950"
               />
             </label>
@@ -52,8 +95,12 @@ const Auth = () => {
           <label className="block">
             <span className="text-sm font-semibold text-slate-700">Email address</span>
             <input
+              name="email"
               type="email"
+              value={form.email}
+              onChange={handleChange}
               placeholder="you@example.com"
+              required
               className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-950"
             />
           </label>
@@ -61,8 +108,12 @@ const Auth = () => {
           <label className="block">
             <span className="text-sm font-semibold text-slate-700">Password</span>
             <input
+              name="password"
               type="password"
+              value={form.password}
+              onChange={handleChange}
               placeholder="Enter password"
+              required
               className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-950"
             />
           </label>
@@ -71,8 +122,12 @@ const Auth = () => {
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">Confirm password</span>
               <input
+                name="confirmPassword"
                 type="password"
+                value={form.confirmPassword}
+                onChange={handleChange}
                 placeholder="Confirm password"
+                required={isCreateAccount}
                 className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none focus:border-slate-950"
               />
             </label>
@@ -80,16 +135,25 @@ const Auth = () => {
 
           {isCreateAccount && (
             <label className="flex items-start gap-3 rounded-md bg-slate-50 p-3 text-sm text-slate-600">
-              <input type="checkbox" className="mt-1 h-4 w-4 rounded border-slate-300" />
+              <input
+                name="accepted"
+                type="checkbox"
+                checked={form.accepted}
+                onChange={handleChange}
+                className="mt-1 h-4 w-4 rounded border-slate-300"
+              />
               <span>I agree to create an account and receive important link management updates.</span>
             </label>
           )}
 
+          {error && <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
+
           <button
-            type="button"
+            type="submit"
+            disabled={loading}
             className="w-full rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
           >
-            {isCreateAccount ? 'Create Account' : 'Login'}
+            {loading ? 'Please wait...' : isCreateAccount ? 'Create Account' : 'Login'}
           </button>
         </form>
 

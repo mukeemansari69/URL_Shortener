@@ -1,8 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { api, shortDomain } from '../lib/api'
 
 const RedirectLink = () => {
   const { id } = useParams()
+  const [destinationUrl, setDestinationUrl] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!id) return
+
+    api
+      .resolveLink(id)
+      .then((result) => {
+        setDestinationUrl(result.destinationUrl)
+        window.location.assign(result.destinationUrl)
+      })
+      .catch((requestError) => setError(requestError.message))
+  }, [id])
 
   return (
     <section className="mx-auto flex min-h-[60vh] w-full max-w-3xl items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
@@ -10,10 +25,10 @@ const RedirectLink = () => {
         <img src="/logo.png" alt="URL Shortner logo" className="mx-auto h-14 w-14 rounded-lg object-contain" />
         <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-slate-500">Redirecting</p>
         <h1 className="mt-3 break-words text-3xl font-bold text-slate-950 sm:text-4xl">
-          url.app/{id || 'short-link'}
+          {shortDomain}/{id || 'short-link'}
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
-          Your destination is being prepared. If it does not open automatically, continue from here.
+          {error || 'Your destination is being prepared. If it does not open automatically, continue from here.'}
         </p>
 
         <div className="mx-auto mt-8 h-2 w-full max-w-md overflow-hidden rounded-full bg-slate-100">
@@ -21,7 +36,12 @@ const RedirectLink = () => {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <button className="rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
+          <button
+            type="button"
+            disabled={!destinationUrl}
+            onClick={() => destinationUrl && window.location.assign(destinationUrl)}
+            className="rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
             Continue
           </button>
           <Link

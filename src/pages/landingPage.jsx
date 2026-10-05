@@ -1,7 +1,51 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { api, shortDomain } from '../lib/api'
 
 const LandingPage = () => {
+  const [form, setForm] = useState({ destinationUrl: '', slug: '' })
+  const [stats, setStats] = useState(null)
+  const [createdLink, setCreatedLink] = useState(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    api
+      .getStats()
+      .then(setStats)
+      .catch(() => setStats(null))
+  }, [])
+
+  const handleChange = (event) => {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setLoading(true)
+    setError('')
+    setCreatedLink(null)
+
+    try {
+      const result = await api.createLink({
+        destinationUrl: form.destinationUrl,
+        slug: form.slug || undefined,
+      })
+      setCreatedLink(result)
+      setForm({ destinationUrl: '', slug: '' })
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const metrics = [
+    [stats ? stats.totalLinks.toLocaleString() : '0', 'Links created'],
+    [stats ? stats.activeLinks.toLocaleString() : '0', 'Active links'],
+    [stats ? stats.totalClicks.toLocaleString() : '0', 'Tracked clicks'],
+  ]
+
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
       <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
@@ -43,12 +87,16 @@ const LandingPage = () => {
             </div>
           </div>
 
-          <form className="mt-5 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">Destination URL</span>
               <input
+                name="destinationUrl"
                 type="url"
+                value={form.destinationUrl}
+                onChange={handleChange}
                 placeholder="https://example.com/very-long-url"
+                required
                 className="mt-2 w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-slate-950"
               />
             </label>
@@ -57,32 +105,42 @@ const LandingPage = () => {
               <span className="text-sm font-semibold text-slate-700">Custom alias</span>
               <div className="mt-2 flex overflow-hidden rounded-md border border-slate-300 bg-white focus-within:border-slate-950">
                 <span className="hidden border-r border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500 sm:inline">
-                  url.app/
+                  {shortDomain}/
                 </span>
                 <input
+                  name="slug"
                   type="text"
+                  value={form.slug}
+                  onChange={handleChange}
                   placeholder="summer-sale"
                   className="min-w-0 flex-1 px-4 py-3 text-sm text-slate-950 outline-none placeholder:text-slate-400"
                 />
               </div>
             </label>
 
+            {error && <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
+            {createdLink && (
+              <Link
+                to={`/link/${createdLink.link.slug}`}
+                className="block rounded-md bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:underline"
+              >
+                Created {shortDomain}/{createdLink.link.slug}
+              </Link>
+            )}
+
             <button
-              type="button"
+              type="submit"
+              disabled={loading}
               className="w-full rounded-md bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
-              Shorten Link
+              {loading ? 'Shortening...' : 'Shorten Link'}
             </button>
           </form>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {[
-          ['12K+', 'Links created'],
-          ['98%', 'Redirect uptime'],
-          ['4.8M', 'Tracked clicks'],
-        ].map(([value, label]) => (
+        {metrics.map(([value, label]) => (
           <div key={label} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-2xl font-bold text-slate-950">{value}</p>
             <p className="mt-1 text-sm text-slate-500">{label}</p>
