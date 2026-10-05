@@ -7,6 +7,7 @@ import LinkPage from './pages/link';
 import Dashboard from './pages/dashboard';
 import LandingPage from './pages/landingPage';
 import Auth from './pages/auth';
+import ProductPage from './pages/product-page';
 
 
 const router=createBrowserRouter([
@@ -28,6 +29,10 @@ const router=createBrowserRouter([
       {
         path:'/link/:id',
         element:<LinkPage/>
+      },
+      {
+        path:'/product/:slug',
+        element:<ProductPage/>
       },
        {
         path:'/:id',

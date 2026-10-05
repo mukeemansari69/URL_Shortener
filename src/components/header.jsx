@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom'
 const navLinks = [
   { label: 'Home', path: '/' },
   { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Analytics', path: '/product/click-analytics' },
 ]
 
 const Header = () => {

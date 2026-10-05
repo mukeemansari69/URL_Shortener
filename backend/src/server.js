@@ -3,6 +3,7 @@ import express from 'express'
 import { config } from './config.js'
 import { authRouter } from './routes/auth.js'
 import { linksRouter } from './routes/links.js'
+import { productPagesRouter } from './routes/productPages.js'
 import { connectKafka } from './services/kafka.js'
 import { connectRedis } from './services/redis.js'
 import { optionalUser } from './utils/auth.js'
@@ -24,6 +25,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/auth', authRouter)
 app.use('/api', linksRouter)
+app.use('/api', productPagesRouter)
 
 app.use((req, res) => {
   res.status(404).json({ message: `Route not found: ${req.method} ${req.path}` })

@@ -50,9 +50,15 @@ const AppLayout = () => {
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-950">Product</h2>
             <div className="mt-4 flex flex-col gap-3 text-sm text-slate-600">
-              <span>Short links</span>
-              <span>Click analytics</span>
-              <span>Secure redirects</span>
+              <Link className="transition hover:text-slate-950" to="/product/short-links">
+                Short links
+              </Link>
+              <Link className="transition hover:text-slate-950" to="/product/click-analytics">
+                Click analytics
+              </Link>
+              <Link className="transition hover:text-slate-950" to="/product/secure-redirects">
+                Secure redirects
+              </Link>
             </div>
           </div>
         </div>

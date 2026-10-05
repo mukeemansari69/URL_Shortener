@@ -64,4 +64,5 @@ export const api = {
       body: JSON.stringify(payload),
     }),
   resolveLink: (slug) => apiRequest(`/redirect/${encodeURIComponent(slug)}`),
+  getProductPage: (slug) => apiRequest(`/product-pages/${encodeURIComponent(slug)}`),
 }
