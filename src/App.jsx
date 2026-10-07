@@ -1,6 +1,7 @@
 import React from 'react'
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import AppLayout from './layouts/app-layout';
 import RedirectLink from './pages/redirect-link';
 import LinkPage from './pages/link';
@@ -46,9 +47,10 @@ const router=createBrowserRouter([
 
 const App = () => {
   return (
-   <RouterProvider router={router}/>
-  
-   
+   <>
+     <RouterProvider router={router}/>
+     <SpeedInsights />
+   </>
   )
 }
 
