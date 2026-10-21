@@ -99,9 +99,14 @@ linksRouter.post('/links', requireUser, async (req, res, next) => {
 
     await publishEvent('link.created', link)
 
+    const requestOrigin = req.get('origin')?.replace(/\/$/, '')
+    const publicBaseUrl = config.frontendOrigins.includes(requestOrigin)
+      ? requestOrigin
+      : config.publicBaseUrl.replace(/\/$/, '')
+
     res.status(201).json({
       link,
-      shortUrl: `${config.publicBaseUrl.replace(/\/$/, '')}/${link.slug}`,
+      shortUrl: `${publicBaseUrl}/${link.slug}`,
     })
   } catch (error) {
     next(error)

@@ -29,9 +29,8 @@ to `index.html`.
 In the API service, set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, then run
 `supabase-url-shortner-schema.sql` once in the Supabase SQL editor. Keep the
 generated `JWT_SECRET`. If you use a custom frontend domain, update
-`FRONTEND_ORIGIN`, `PUBLIC_BASE_URL`, and `SHORT_DOMAIN` on the API and
-`VITE_SHORT_DOMAIN` on the frontend. Add any additional frontend origins as a
-comma-separated list in `FRONTEND_ORIGIN`.
+`FRONTEND_ORIGIN`, `PUBLIC_BASE_URL`, and `SHORT_DOMAIN` on the API. Add any
+additional frontend origins as a comma-separated list in `FRONTEND_ORIGIN`.
 
 For durable storage, configure Supabase or a persistent managed Redis
 `REDIS_URL`. The in-memory fallback loses accounts and links whenever the
@@ -50,7 +49,6 @@ environment variables before deploying:
   SQL schema above once.
 - `VITE_API_URL`: `/api` when Vercel runs the API function, or
   `https://<your-render-api-host>/api` when the frontend uses the Render API.
-- `VITE_SHORT_DOMAIN`: your Vercel/custom domain, without `https://`.
 - For the Vercel API function, set `FRONTEND_ORIGIN` to the Vercel site origin.
   For a Render API used by both hosts, include both site origins separated by
   commas.

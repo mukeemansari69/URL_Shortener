@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api, shortDomain } from '../lib/api'
+import { api, makeShortUrl, shortDomain } from '../lib/api'
 
 const LandingPage = () => {
   const [form, setForm] = useState({ destinationUrl: '', slug: '' })
@@ -120,12 +120,14 @@ const LandingPage = () => {
 
             {error && <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</p>}
             {createdLink && (
-              <Link
-                to={`/link/${createdLink.link.slug}`}
-                className="block rounded-md bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:underline"
+              <a
+                href={makeShortUrl(createdLink.link.slug)}
+                target="_blank"
+                rel="noreferrer"
+                className="block break-all rounded-md bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 hover:underline"
               >
-                Created {shortDomain}/{createdLink.link.slug}
-              </Link>
+                {makeShortUrl(createdLink.link.slug)}
+              </a>
             )}
 
             <button

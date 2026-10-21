@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { api, shortDomain } from '../lib/api'
+import { api, makeShortUrl, shortDomain } from '../lib/api'
 
 const LinkPage = () => {
   const { id } = useParams()
@@ -21,7 +21,7 @@ const LinkPage = () => {
       .catch((requestError) => setError(requestError.message))
   }, [slug])
 
-  const shortUrl = `${window.location.origin}/${slug}`
+  const shortUrl = makeShortUrl(slug)
   const clickRate = useMemo(() => {
     if (!link) return '0%'
     return link.clicks > 0 ? '100%' : '0%'

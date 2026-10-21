@@ -2,7 +2,10 @@ const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 const TOKEN_KEY = 'url-shortner-token'
 const USER_KEY = 'url-shortner-user'
 
-export const shortDomain = import.meta.env.VITE_SHORT_DOMAIN || window.location.host
+// A short link must use the host currently serving the app. A build-time
+// VITE_SHORT_DOMAIN can be stale (for example, localhost from local .env).
+export const shortDomain = window.location.host
+export const makeShortUrl = (slug) => `${window.location.origin}/${encodeURIComponent(slug)}`
 
 function getStoredUser() {
   try {
