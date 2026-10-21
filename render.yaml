@@ -1,0 +1,38 @@
+services:
+  - type: web
+    runtime: node
+    name: url-shortner-api
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PUBLIC_BASE_URL
+        value: https://url-shortner-frontend.onrender.com
+      - key: SHORT_DOMAIN
+        value: url-shortner-frontend.onrender.com
+      - key: FRONTEND_ORIGIN
+        value: https://url-shortner-frontend.onrender.com
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+  - type: web
+    runtime: static
+    name: url-shortner-frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://url-shortner-api.onrender.com/api
+      - key: VITE_SHORT_DOMAIN
+        value: url-shortner-frontend.onrender.com

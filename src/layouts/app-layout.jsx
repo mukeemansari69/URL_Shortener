@@ -14,7 +14,7 @@ const AppLayout = () => {
       <footer className="border-t border-slate-200 bg-white">
         <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
           <div>
-            <Link to="/" className="inline-flex items-center gap-3">
+            <Link to="/dashboard" className="inline-flex items-center gap-3">
               <img
                 src="/logo.png"
                 alt="URL Shortner logo"
@@ -35,8 +35,8 @@ const AppLayout = () => {
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-950">Pages</h2>
             <div className="mt-4 flex flex-col gap-3 text-sm text-slate-600">
-              <Link className="transition hover:text-slate-950" to="/">
-                Home
+              <Link className="transition hover:text-slate-950" to="/create">
+                Create
               </Link>
               <Link className="transition hover:text-slate-950" to="/dashboard">
                 Dashboard

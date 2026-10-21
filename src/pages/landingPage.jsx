@@ -70,10 +70,10 @@ const LandingPage = () => {
               Open Dashboard
             </Link>
             <Link
-              to="/auth"
+              to="/dashboard"
               className="rounded-md border border-slate-300 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-950 transition hover:border-slate-950"
             >
-              Sign In
+              View Dashboard
             </Link>
           </div>
         </div>

@@ -11,6 +11,7 @@ import {
   updateLink,
 } from '../repositories/linkRepository.js'
 import { publishEvent } from '../services/kafka.js'
+import { requireUser } from '../utils/auth.js'
 
 export const linksRouter = express.Router()
 
@@ -49,24 +50,24 @@ linksRouter.get('/config', (_req, res) => {
   })
 })
 
-linksRouter.get('/stats', async (_req, res, next) => {
+linksRouter.get('/stats', requireUser, async (req, res, next) => {
   try {
-    res.json(await getStats())
+    res.json(await getStats({ ownerId: req.user.sub }))
   } catch (error) {
     next(error)
   }
 })
 
-linksRouter.get('/links', async (req, res, next) => {
+linksRouter.get('/links', requireUser, async (req, res, next) => {
   try {
-    const links = await listLinks({ search: req.query.search || '' })
+    const links = await listLinks({ search: req.query.search || '', ownerId: req.user.sub })
     res.json({ links })
   } catch (error) {
     next(error)
   }
 })
 
-linksRouter.post('/links', async (req, res, next) => {
+linksRouter.post('/links', requireUser, async (req, res, next) => {
   try {
     const destinationUrl = normalizeUrl(req.body.destinationUrl)
     const slug = await makeUniqueSlug(req.body.slug?.trim())
@@ -91,7 +92,7 @@ linksRouter.post('/links', async (req, res, next) => {
       slug,
       destinationUrl,
       status: 'Active',
-      ownerId: req.user?.sub || 'anonymous',
+      ownerId: req.user.sub,
       createdAt: now,
       updatedAt: now,
     })
@@ -107,9 +108,9 @@ linksRouter.post('/links', async (req, res, next) => {
   }
 })
 
-linksRouter.get('/links/:slug', async (req, res, next) => {
+linksRouter.get('/links/:slug', requireUser, async (req, res, next) => {
   try {
-    const link = await getLink(req.params.slug)
+    const link = await getLink(req.params.slug, { ownerId: req.user.sub })
     if (!link) {
       res.status(404).json({ message: 'Short link not found.' })
       return
@@ -121,7 +122,7 @@ linksRouter.get('/links/:slug', async (req, res, next) => {
   }
 })
 
-linksRouter.patch('/links/:slug', async (req, res, next) => {
+linksRouter.patch('/links/:slug', requireUser, async (req, res, next) => {
   try {
     const destinationUrl = req.body.destinationUrl ? normalizeUrl(req.body.destinationUrl) : undefined
     if (req.body.destinationUrl && !destinationUrl) {
@@ -129,15 +130,16 @@ linksRouter.patch('/links/:slug', async (req, res, next) => {
       return
     }
 
+    const existing = await getLink(req.params.slug, { ownerId: req.user.sub })
+    if (!existing) {
+      res.status(404).json({ message: 'Short link not found.' })
+      return
+    }
+
     const link = await updateLink(req.params.slug, {
       ...(destinationUrl ? { destinationUrl } : {}),
       ...(req.body.status ? { status: req.body.status } : {}),
     })
-
-    if (!link) {
-      res.status(404).json({ message: 'Short link not found.' })
-      return
-    }
 
     await publishEvent('link.updated', link)
 

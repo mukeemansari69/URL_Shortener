@@ -8,6 +8,7 @@ import Dashboard from './pages/dashboard';
 import LandingPage from './pages/landingPage';
 import Auth from './pages/auth';
 import ProductPage from './pages/product-page';
+import ProtectedRoute from './components/protected-route';
 
 
 const router=createBrowserRouter([
@@ -16,23 +17,27 @@ const router=createBrowserRouter([
     children:[
       {
         path:'/',
-        element:<LandingPage/>
+        element:<Auth/>
       },
       {
         path:'/dashboard',
-        element:<Dashboard/>
+        element:<ProtectedRoute><Dashboard/></ProtectedRoute>
       },
       {
         path:'/auth',
         element:<Auth/>
       },
       {
+        path:'/create',
+        element:<ProtectedRoute><LandingPage/></ProtectedRoute>
+      },
+      {
         path:'/link/:id',
-        element:<LinkPage/>
+        element:<ProtectedRoute><LinkPage/></ProtectedRoute>
       },
       {
         path:'/product/:slug',
-        element:<ProductPage/>
+        element:<ProtectedRoute><ProductPage/></ProtectedRoute>
       },
        {
         path:'/:id',

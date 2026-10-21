@@ -8,6 +8,12 @@ export const getRedis = () => client
 export const isRedisReady = () => connected && client?.isReady
 
 export async function connectRedis() {
+  if (!config.redisUrl) {
+    connected = false
+    console.warn('[redis] using in-memory fallback: REDIS_URL is not set')
+    return
+  }
+
   client = createClient({
     url: config.redisUrl,
     socket: {

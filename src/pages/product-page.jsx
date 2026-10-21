@@ -57,7 +57,7 @@ const ProductPage = () => {
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
-              to="/"
+              to="/create"
               className="rounded-md bg-slate-950 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
             >
               Create Link

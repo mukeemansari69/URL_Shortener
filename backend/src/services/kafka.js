@@ -5,6 +5,12 @@ let producer
 let enabled = false
 
 export async function connectKafka() {
+  if (!config.kafkaBrokers.length) {
+    enabled = false
+    console.warn('[kafka] publishing disabled: KAFKA_BROKERS is not set')
+    return
+  }
+
   const kafka = new Kafka({
     clientId: config.kafkaClientId,
     brokers: config.kafkaBrokers,

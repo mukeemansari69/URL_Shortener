@@ -1,17 +1,37 @@
-import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { getSessionUser, signOut } from '../lib/api'
 
 const navLinks = [
-  { label: 'Home', path: '/' },
   { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Create', path: '/create' },
   { label: 'Analytics', path: '/product/click-analytics' },
 ]
 
 const Header = () => {
+  const [user, setUser] = useState(() => getSessionUser())
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const syncAuth = () => setUser(getSessionUser())
+    window.addEventListener('auth-change', syncAuth)
+    window.addEventListener('storage', syncAuth)
+
+    return () => {
+      window.removeEventListener('auth-change', syncAuth)
+      window.removeEventListener('storage', syncAuth)
+    }
+  }, [])
+
+  const handleLogout = async () => {
+    await signOut()
+    navigate('/auth')
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur">
       <nav className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-        <Link to="/" className="flex items-center gap-3">
+        <Link to={user ? '/dashboard' : '/auth'} className="flex items-center gap-3">
           <img
             src="/logo.png"
             alt="URL Shortner logo"
@@ -26,7 +46,7 @@ const Header = () => {
         </Link>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          {navLinks.map((item) => (
+          {user && navLinks.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -42,12 +62,22 @@ const Header = () => {
             </NavLink>
           ))}
 
-          <Link
-            to="/auth"
-            className="rounded-md border border-slate-950 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-950 hover:text-white"
-          >
-            Login
-          </Link>
+          {user ? (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-md border border-slate-950 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-950 hover:text-white"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="rounded-md border border-slate-950 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-slate-950 hover:text-white"
+            >
+              Login
+            </Link>
+          )}
         </div>
       </nav>
     </header>

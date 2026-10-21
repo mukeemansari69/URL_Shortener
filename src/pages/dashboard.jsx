@@ -41,7 +41,7 @@ const Dashboard = () => {
           <h1 className="mt-2 text-3xl font-bold text-slate-950 sm:text-4xl">Manage your short links</h1>
         </div>
         <Link
-          to="/"
+          to="/create"
           className="rounded-md bg-slate-950 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
         >
           Create Link

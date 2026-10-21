@@ -30,3 +30,12 @@ export function optionalUser(req, _res, next) {
 
   next()
 }
+
+export function requireUser(req, res, next) {
+  if (!req.user?.sub) {
+    res.status(401).json({ message: 'Please login first.' })
+    return
+  }
+
+  next()
+}

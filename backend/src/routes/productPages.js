@@ -1,5 +1,6 @@
 import express from 'express'
 import { getStats } from '../repositories/linkRepository.js'
+import { requireUser } from '../utils/auth.js'
 
 export const productPagesRouter = express.Router()
 
@@ -69,7 +70,7 @@ const pages = {
   },
 }
 
-productPagesRouter.get('/product-pages/:slug', async (req, res, next) => {
+productPagesRouter.get('/product-pages/:slug', requireUser, async (req, res, next) => {
   try {
     const page = pages[req.params.slug]
 
@@ -80,7 +81,7 @@ productPagesRouter.get('/product-pages/:slug', async (req, res, next) => {
 
     res.json({
       page,
-      stats: await getStats(),
+      stats: await getStats({ ownerId: req.user.sub }),
     })
   } catch (error) {
     next(error)
