@@ -1,4 +1,16 @@
-const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
+function normalizeApiUrl(value) {
+  const configuredUrl = value?.trim() || '/api'
+  const hasProtocol = /^https?:\/\//i.test(configuredUrl)
+  const isLocalHost = /^(localhost|127\.0\.0\.1)(:\d+)?(?:\/|$)/i.test(configuredUrl)
+  const baseUrl = configuredUrl.startsWith('/')
+    ? configuredUrl
+    : `${hasProtocol ? '' : isLocalHost ? 'http://' : 'https://'}${configuredUrl}`
+  const normalizedUrl = baseUrl.replace(/\/+$/, '')
+
+  return /\/api$/i.test(normalizedUrl) ? normalizedUrl : `${normalizedUrl}/api`
+}
+
+const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL)
 const TOKEN_KEY = 'url-shortner-token'
 const USER_KEY = 'url-shortner-user'
 

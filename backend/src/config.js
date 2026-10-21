@@ -13,6 +13,13 @@ const frontendOrigins = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173,h
   .map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean)
 
+const isLocalOrigin = (origin = '') => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)
+const configuredPublicBaseUrl = process.env.PUBLIC_BASE_URL?.trim().replace(/\/$/, '')
+const publicBaseUrl =
+  (configuredPublicBaseUrl && !isLocalOrigin(configuredPublicBaseUrl) ? configuredPublicBaseUrl : '') ||
+  frontendOrigins.find((origin) => !isLocalOrigin(origin)) ||
+  'http://localhost:5173'
+
 const kafkaBrokers = (process.env.KAFKA_BROKERS || '')
   .split(',')
   .map((broker) => broker.trim())
@@ -25,8 +32,8 @@ if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process
 export const config = {
   port: Number(process.env.PORT || 4000),
   frontendOrigins,
-  publicBaseUrl: process.env.PUBLIC_BASE_URL || 'http://localhost:5173',
-  shortDomain: process.env.SHORT_DOMAIN || 'url.app',
+  publicBaseUrl,
+  shortDomain: process.env.SHORT_DOMAIN || new URL(publicBaseUrl).host,
   jwtSecret: process.env.JWT_SECRET || 'dev-only-secret',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   redisUrl: process.env.REDIS_URL || '',

@@ -45,9 +45,15 @@ app.get('/api/health', (_req, res) => {
   res.json({ ok: true, service: 'url-shortner-backend' })
 })
 
-app.use('/api/auth', authRouter)
-app.use('/api', linksRouter)
-app.use('/api', productPagesRouter)
+const apiRouter = express.Router()
+apiRouter.use('/auth', authRouter)
+apiRouter.use(linksRouter)
+apiRouter.use(productPagesRouter)
+
+// Render receives /api/... URLs from the browser. Vercel function rewrites can
+// strip that prefix, so support both forms of the API routes.
+app.use('/api', apiRouter)
+app.use(apiRouter)
 
 app.use((req, res) => {
   res.status(404).json({ message: `Route not found: ${req.method} ${req.path}` })

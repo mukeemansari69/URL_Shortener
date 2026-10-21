@@ -53,4 +53,10 @@ environment variables before deploying:
   For a Render API used by both hosts, include both site origins separated by
   commas.
 
+For the split Vercel frontend + Render API setup, set `VITE_API_URL` in the
+Vercel Project Environment Variables to the full Render API URL ending in
+`/api`, and set the Vercel origin in the Render API's `FRONTEND_ORIGIN`. Redeploy
+both services after changing these values; Vite reads `VITE_API_URL` at build
+time.
+
 Do not expose `SUPABASE_SERVICE_ROLE_KEY` or `JWT_SECRET` in any `VITE_*` variable.
